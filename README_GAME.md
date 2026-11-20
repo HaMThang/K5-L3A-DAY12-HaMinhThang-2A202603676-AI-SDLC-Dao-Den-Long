@@ -26,7 +26,9 @@ Mở **đúng địa chỉ in trong terminal**; server tự chọn một cổng 
 
 Thu thập đom đóm vàng; mỗi Đèn Lồng Lớn cần 10 đom đóm và có thể nạp nhiều lần. Thắp đủ đèn trước bình minh để qua Đêm tiếp theo. Mây có 3 Ngọn Lửa mỗi Đêm; mất hết sẽ thua. Đêm 2 có Gió Lạc cướp đom đóm và Bùa Gió tăng tốc; Đêm 3 có tầng đảo và gió mạnh. Menu có chơi lại Đêm, cài đặt âm lượng/độ nhạy chuột và về menu.
 
-Ở Đêm 3, Mây bắt đầu trên tầng cao cạnh tháp chuông. Bục nhảy có bán kính kích hoạt 0,5 m; chân tháp là vật cản, không thể đi xuyên vào bên dưới.
+Ở Đêm 3, Mây bắt đầu trên tầng cao cạnh tháp chuông. Bục nhảy có bán kính kích hoạt 0,5 m; chân tháp là vật cản, không thể đi xuyên vào bên dưới. Đèn hiện thanh nhiên liệu; khi dầu dưới 30, đèn và thanh nhấp nháy. Trong **Cài đặt**, bật **Bảng màu dễ phân biệt** để đổi mắt/viền Bóng Mực sang xanh lam và cảnh báo sang trắng kèm biểu tượng ⚠.
+
+Môi trường có cây đổ và đá đặt cố định ở cả ba bản đồ; chúng có va chạm và chặn Mây. Đêm 3 có tháp chuông nhiều mái, cột đỡ và chuông treo. Bóng Mực dùng hình khối nhiều thùy, gai và mắt phát sáng.
 
 ## Kiểm tra
 

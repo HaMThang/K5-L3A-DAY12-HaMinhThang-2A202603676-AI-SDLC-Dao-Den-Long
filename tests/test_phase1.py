@@ -27,8 +27,10 @@ class PhaseOneTests(unittest.TestCase):
                                        [{"id": f"L{i}", "lit": True} for i in range(2, 6)]})
         self.assertEqual(g.score, 0)
         g.step(STILL, {"interact": True})
-        self.assertEqual(g.state, "won")
-        self.assertEqual([e["name"] for e in g.events], ["deposit", "lantern_lit", "game_over"])
+        # Ticket-03 replaces the Phase 1 early-win rule: lighting every lantern
+        # now keeps the night running until dawn.
+        self.assertEqual(g.state, "playing")
+        self.assertEqual([e["name"] for e in g.events], ["deposit", "lantern_lit"])
         self.assertEqual(g.player["carried"], 0)
 
     def test_pulse_stuns_and_pushes(self):
