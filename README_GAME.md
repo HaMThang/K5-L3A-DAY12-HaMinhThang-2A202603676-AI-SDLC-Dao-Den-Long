@@ -28,7 +28,7 @@ Thu thập đom đóm vàng; mỗi Đèn Lồng Lớn cần 10 đom đóm và c�
 
 Ở Đêm 3, Mây bắt đầu trên tầng cao cạnh tháp chuông. Bục nhảy có bán kính kích hoạt 0,5 m; chân tháp là vật cản, không thể đi xuyên vào bên dưới. Đèn hiện thanh nhiên liệu; khi dầu dưới 30, đèn và thanh nhấp nháy. Trong **Cài đặt**, bật **Bảng màu dễ phân biệt** để đổi mắt/viền Bóng Mực sang xanh lam và cảnh báo sang trắng kèm biểu tượng ⚠.
 
-Môi trường có cây đổ và đá đặt cố định ở cả ba bản đồ; chúng có va chạm và chặn Mây. Đêm 3 có tháp chuông nhiều mái, cột đỡ và chuông treo. Bóng Mực dùng hình khối nhiều thùy, gai và mắt phát sáng.
+Môi trường có cỏ, hoa dại và hai ngôi nhà gỗ mỗi bản đồ. Đảo Chuông có cụm núi đá cao quanh các tầng; vùng chân núi có va chạm. Mây dùng model Archangel Artamiel từ gói người dùng cung cấp, đứng theo trục Y, đội nón lá và tự phát sáng.
 
 ## Kiểm tra
 

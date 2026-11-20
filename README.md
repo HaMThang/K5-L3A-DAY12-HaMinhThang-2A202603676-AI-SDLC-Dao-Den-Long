@@ -1,10 +1,14 @@
 # Day 12 — AI SDLC: Đảo Đèn Lồng
 
-## Chơi bản Phase 2
+## Chạy game
 
-Cần Python 3.10+ và trình duyệt hỗ trợ WebGL. Chạy `python3 -m src.server`, rồi mở **đúng địa chỉ được in ra trong terminal** (Windows dùng `python`). Điều khiển bằng WASD, Q/R hoặc chuột để xoay camera, Space nhảy, Shift lướt, E nạp đèn, J Tỏa Sáng, P/Esc tạm dừng. Chạy test bằng `python3 -m unittest discover -s tests -v`; chạy Test Contract v1.1 bằng `python3 -m src.headless --seed 1 --night 2 --ticks 60 --out result.jsonl`.
+Cần Python 3.10+ và trình duyệt hỗ trợ WebGL. Sau khi clone repo, chạy:
 
-[Hướng dẫn chơi và kiểm thử chi tiết](README_GAME.md) · [Spec Phase 2](docs/notes/phase-2.md) · [Bằng chứng Phase 2](docs/proof/phase-2.md)
+```bash
+python -m src.server
+```
+
+Mở URL mà server in ra trong terminal. Không cần cài thêm package Python. Điều khiển bằng WASD, Q/R hoặc chuột để xoay camera, Space nhảy, Shift lướt, E nạp đèn, J Tỏa Sáng, P/Esc tạm dừng. Xem [hướng dẫn chơi](README_GAME.md), [Spec Phase 2](docs/notes/phase-2.md) và [bằng chứng Phase 2](docs/proof/phase-2.md).
 
 > **Cá nhân** (1 người / 1 MSSV) · Áp dụng SDLC cùng AI để xây một **game 3D** qua **4 phase**, từ yêu cầu ban đầu tới bản phát hành.
 > **Lab board + trợ giảng:** **[Đảo Đèn Lồng Lab](https://claude.ai/artifact/Q1RYyv1dxjUczzCbd2ZnoW)**

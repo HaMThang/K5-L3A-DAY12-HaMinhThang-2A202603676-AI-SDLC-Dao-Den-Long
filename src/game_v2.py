@@ -42,10 +42,10 @@ def map_for(n):
 
 
 def obstacles_for(n):
-    # (x, z, radius); mirrored by the WebGL scene. Keep spawn, objectives and launch pads clear.
-    if n==1: return [(-9,14,1.4),(9,19,1.2),(-20,-5,1.6),(20,-8,1.5),(4,-25,1.3)]
-    if n==2: return [(-12,8,1.4),(10,-14,1.5),(62,12,1.4),(80,-15,1.5),(35,4,1.0)]
-    return [(-30,-8,1.5),(29,-7,1.5),(-18,-29,1.8),(19,-29,1.8),(31,12,1.2),(-31,12,1.2)]
+    # Keep obstacles spaced apart and clear of spawns, objectives, and launch pads.
+    if n==1: return [(-12,14,1.1,'rock'),(11,19,1.2,'wood'),(-21,-7,1.3,'wood'),(19,-9,1.2,'rock'),(4,-27,1.0,'wood'),(-7,-13,1.0,'rock'),(7,-13,1.2,'wood'),(2,11,1.0,'rock'),(-6,3,1.1,'wood'),(-30,-14,1.5,'rock'),(30,15,1.2,'wood'),(7,31,1.1,'rock'),(-7,31,1.0,'wood'),(-26,26,3.1,'house'),(36,-4,3.1,'house')]
+    if n==2: return [(-13,8,1.1,'rock'),(11,-14,1.1,'wood'),(57,12,1.1,'wood'),(82,-14,1.2,'rock'),(36,6,1.0,'wood'),(-20,-8,1.2,'rock'),(-4,9,1.0,'wood'),(8,-4,1.1,'rock'),(-7,-22,1.1,'wood'),(50,8,1.2,'rock'),(76,5,1.0,'wood'),(88,-22,1.1,'rock'),(63,-20,1.0,'wood'),(-23,5,3.1,'house'),(94,5,3.1,'house')]
+    return [(-32,-7,1.2,'wood'),(29,-7,1.2,'rock'),(-18,-32,1.3,'rock'),(17,-31,1.2,'wood'),(32,14,1.0,'wood'),(-32,14,1.0,'rock'),(-24,25,1.0,'rock'),(23,25,1.1,'wood'),(-10,-39,1.1,'wood'),(8,-40,1.0,'rock'),(-39,0,1.0,'wood'),(39,0,1.0,'rock'),(0,39,1.1,'wood'),(-2,-18,3.1,'house'),(-12,-14,3.1,'house'),(-34,21,4.3,'mountain'),(34,21,4.3,'mountain'),(-37,-25,3.8,'mountain'),(37,-25,3.8,'mountain'),(12,40,3.4,'mountain')]
 
 
 class Game:
@@ -180,8 +180,18 @@ class Game:
             if 24<=along<=30 and abs(across)<=1.5: return (30-along)/2
         return 0.
 
-    def obstacle_at(self,x,z):
-        return any(math.hypot(x-ox,z-oz)<radius+.45 for ox,oz,radius in self.obstacles)
+    def obstacle_at(self,x,z,player_y=0.):
+        for ox,oz,radius,kind in self.obstacles:
+            dx,dz=x-ox,z-oz
+            if kind in ('rock','mountain') and math.hypot(dx,dz)<radius+.5: return True
+            if kind=='house' and abs(dx)<radius and abs(dz)<radius: return True
+            if kind=='wood' and player_y<.4:
+                angle=(ox*13+oz*7)%math.tau
+                along=dx*math.cos(angle)+dz*math.sin(angle)
+                across=-dx*math.sin(angle)+dz*math.cos(angle)
+                along=max(-radius*1.2,min(radius*1.2,along))
+                if math.hypot(dx*math.cos(angle)+dz*math.sin(angle)-along,across)<.48: return True
+        return False
 
     def drop(self,count,where):
         for _ in range(count):
@@ -264,7 +274,7 @@ class Game:
         if self.wind['active']:
             vx+=2*math.cos(math.radians(self.wind_dir)); vz+=2*math.sin(math.radians(self.wind_dir))
         nx,nz=p['pos'][0]+vx/HZ,p['pos'][2]+vz/HZ
-        if self.obstacle_at(nx,nz): nx,nz=p['pos'][0],p['pos'][2]
+        if self.obstacle_at(nx,nz,p['pos'][1]): nx,nz=p['pos'][0],p['pos'][2]
         if self.night==3 and math.hypot(nx,nz)<2 and p['pos'][1]<8.5:
             radius=math.hypot(p['pos'][0],p['pos'][2])
             if radius<2:
@@ -437,7 +447,7 @@ class Game:
         p=self.player; floor=self.ground(p['pos'][0],p['pos'][2],p['pos'][1])
         return {'type':'snapshot','tick':self.tick,'sim_tick':self.sim_tick,'night':self.night,'state':self.state,
                 'time_left_s':r(self.time_left()),'score':self.score,'wind':self.wind.copy(),
-                'obstacles':[{'pos':[r(x),0.,r(z)],'radius':r(radius)} for x,z,radius in self.obstacles],
+                'obstacles':[{'pos':[r(x),0.,r(z)],'radius':r(radius),'kind':kind} for x,z,radius,kind in self.obstacles],
                 'player':{'pos':[r(v) for v in p['pos']],'vel':[r(v) for v in p['vel']],'flames':p['flames'],'carried':p['carried'],
                           'grounded':floor is not None and abs(p['pos'][1]-floor)<.001,'capacity':self.capacity(),
                           'invuln':self.invuln>0,'dash_cd_s':r(self.dash_cd/HZ),'pulse_cd_s':r(self.pulse_cd/HZ),'charm_s':r(self.charm_ticks/HZ)},

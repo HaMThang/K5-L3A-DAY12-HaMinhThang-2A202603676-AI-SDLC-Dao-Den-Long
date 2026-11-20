@@ -25,6 +25,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
             self.respond((ROOT / "index.html").read_bytes(), content_type="text/html; charset=utf-8")
+        elif self.path in ("/assets/firefly-wisp.png", "/assets/archangel-light.png", "/assets/archangel-light.obj"):
+            name = self.path.rsplit("/", 1)[-1]
+            asset = ROOT / "assets" / name
+            content_type = "text/plain; charset=utf-8" if name.endswith(".obj") else "image/png"
+            self.respond(asset.read_bytes(), content_type=content_type)
         elif self.path == "/state":
             with lock: self.respond(game.snapshot())
         else: self.respond({"error": "not found"}, 404)
