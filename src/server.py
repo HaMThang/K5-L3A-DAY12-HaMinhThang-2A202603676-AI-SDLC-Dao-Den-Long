@@ -1,5 +1,6 @@
 """Local browser game server; the simulation stays in src.game."""
 import json
+import argparse
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -7,8 +8,9 @@ from .game import Game
 
 ROOT = Path(__file__).resolve().parent
 game = Game()
+total_score = 0
 lock = threading.Lock()
-prior = {key: False for key in ("jump", "interact", "pulse", "dash")}
+prior = {key: False for key in ("jump", "interact", "pulse", "dash", "pause")}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -28,12 +30,22 @@ class Handler(BaseHTTPRequestHandler):
         else: self.respond({"error": "not found"}, 404)
 
     def do_POST(self):
-        global game, prior
+        global game, prior, total_score
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))))
             with lock:
-                if self.path == "/restart":
-                    game = Game()
+                if self.path in ("/restart", "/start", "/next"):
+                    if self.path == "/start":
+                        night = int(body.get("night", 1))
+                        total_score = 0
+                    elif self.path == "/next":
+                        if game.state != "won" or game.night >= 3:
+                            self.respond({"error": "next night unavailable"}, 400)
+                            return
+                        total_score += game.score
+                        night = game.night + 1
+                    else: night = game.night
+                    game = Game(night=night)
                     prior = {key: False for key in prior}
                 elif self.path == "/step":
                     buttons = {key: bool(body.get(key, False)) for key in prior}
@@ -44,14 +56,17 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     self.respond({"error": "not found"}, 404)
                     return
-                self.respond({"snapshot": game.snapshot(), "events": game.events})
+                self.respond({"snapshot": game.snapshot(), "events": game.events, "total_score": total_score + game.score})
         except (ValueError, TypeError, KeyError) as exc:
             self.respond({"error": str(exc)}, 400)
 
 
 def main():
-    server = ThreadingHTTPServer(("127.0.0.1", 8000), Handler)
-    print("Dao Den Long: http://127.0.0.1:8000", flush=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=0, help="TCP port; 0 selects a free port")
+    args = parser.parse_args()
+    server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    print(f"Dao Den Long: http://127.0.0.1:{server.server_port}", flush=True)
     try: server.serve_forever()
     except KeyboardInterrupt: pass
     finally: server.server_close()

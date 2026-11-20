@@ -7,3 +7,11 @@
 - Harness cập nhật: `AGENTS.md` có lệnh build, chạy, test, headless thực tế; logic tách khỏi render.
 - Token/chi phí: giao diện phiên không cung cấp số token/chi phí chính xác, nên chưa ước tính số liệu để tránh ghi sai.
 - Tiết kiệm token: dùng thư viện chuẩn Python, một module gameplay dùng chung cho browser và headless.
+
+## Phase 2
+
+- Công cụ: Codex; đọc Ticket-02 trực tiếp trong Chrome qua giao diện trợ năng do web fetch không mở được Claude artifact.
+- Mục tiêu: thay số Phase 1 bằng chuẩn v1.1, thêm ba bản đồ, dash/pause/charm/drifter, màn chơi và test.
+- Sai sót phát hiện trong quá trình làm: ánh xạ E trùng xoay camera; chuyển xoay phải sang R và thêm chuột. Resume pause cần nhả cạnh phím trước khi gửi `pause:true`; đã sửa.
+- Harness: cập nhật `AGENTS.md`, thêm `tests/test_phase2.py`; vẫn không dùng phụ thuộc ngoài Python chuẩn.
+- Token/chi phí: phiên không cung cấp số đếm chính xác, nên không ghi ước tính giả.

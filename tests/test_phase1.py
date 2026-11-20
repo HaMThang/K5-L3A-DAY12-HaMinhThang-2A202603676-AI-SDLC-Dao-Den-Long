@@ -22,7 +22,7 @@ class PhaseOneTests(unittest.TestCase):
 
     def test_deposit_lights_and_wins_without_scenario_score(self):
         g = Game(scenario={"random_motes": False, "random_shades": False,
-                           "player": {"carried": 3},
+                           "player": {"carried": T["lantern_cost"]},
                            "lanterns": [{"id": "L1", "pos": [0, 0, 0]}] +
                                        [{"id": f"L{i}", "lit": True} for i in range(2, 6)]})
         self.assertEqual(g.score, 0)
@@ -33,10 +33,10 @@ class PhaseOneTests(unittest.TestCase):
 
     def test_pulse_stuns_and_pushes(self):
         g = Game(scenario={"random_motes": False, "random_shades": False,
-                           "player": {"carried": 2}, "shades": [{"pos": [2, 0, 0]}]})
+                           "player": {"carried": T["pulse_cost"]}, "shades": [{"pos": [2, 0, 0]}]})
         g.step(STILL, {"pulse": True})
         self.assertEqual(g.player["carried"], 0)
-        self.assertEqual(g.shades[0]["pos"][0], 5)
+        self.assertAlmostEqual(g.shades[0]["pos"][0], 2 + T["pulse_push_m"] / 15)
         self.assertEqual(g.snapshot()["shades"][0]["state"], "stunned")
         self.assertEqual(g.events[0]["data"], {"stunned_ids": ["S1"]})
 
@@ -45,7 +45,7 @@ class PhaseOneTests(unittest.TestCase):
                            "shades": [{"pos": [0, 0, 0]}], "player": {"carried": 3}})
         g.step(STILL, {})
         self.assertEqual(g.player["flames"], 2)
-        self.assertEqual(g.events[0]["data"]["dropped"], 2)
+        self.assertEqual(g.events[0]["data"]["dropped"], 1)
         for _ in range(30): g.step(STILL, {})
         self.assertEqual(g.player["flames"], 2)
         dawn = Game(scenario={"random_motes": False, "random_shades": False, "time_left_s": 1 / 60})
@@ -88,7 +88,7 @@ class PhaseOneTests(unittest.TestCase):
             self.assertEqual(outputs[0], outputs[1])
             records = [json.loads(line) for line in outputs[0].splitlines()]
             self.assertEqual(records[0]["tick"], 0)
-            self.assertEqual(records[-1], {"type": "end", "ticks": 12, "state": "playing", "score": 10})
+            self.assertEqual(records[-1], {"type": "end", "ticks": 12, "state": "playing", "score": 0})
             sc.write_text("{invalid", encoding="utf-8")
             bad = subprocess.run([sys.executable, "-m", "src.headless", "--seed", "7", "--night", "1",
                                   "--scenario", str(sc), "--ticks", "1", "--out", str(d / "bad.jsonl")], cwd=ROOT, capture_output=True)

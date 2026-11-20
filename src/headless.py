@@ -13,7 +13,7 @@ def parse_inputs(value):
     previous = -1
     frames = {}
     for frame in value["frames"]:
-        if not isinstance(frame, dict) or set(frame) - {"tick", "move", "cam_yaw_deg", "jump", "interact", "pulse", "dash"}:
+        if not isinstance(frame, dict) or set(frame) - {"tick", "move", "cam_yaw_deg", "jump", "interact", "pulse", "dash", "pause"}:
             raise ValueError("invalid frame")
         tick = frame.get("tick")
         if type(tick) is not int or tick <= previous or tick < 0:
@@ -25,7 +25,7 @@ def parse_inputs(value):
                 raise ValueError("invalid move")
         if "cam_yaw_deg" in frame and (type(frame["cam_yaw_deg"]) not in (int, float) or not math.isfinite(frame["cam_yaw_deg"])):
             raise ValueError("invalid cam yaw")
-        for key in ("jump", "interact", "pulse", "dash"):
+        for key in ("jump", "interact", "pulse", "dash", "pause"):
             if key in frame and type(frame[key]) is not bool: raise ValueError("invalid button")
         frames[tick] = frame
     return frames
@@ -34,8 +34,8 @@ def parse_inputs(value):
 def run(args):
     scenario = json.loads(Path(args.scenario).read_text(encoding="utf-8")) if args.scenario else None
     frames = parse_inputs(json.loads(Path(args.inputs).read_text(encoding="utf-8"))) if args.inputs else {}
-    game = Game(args.seed, scenario)
-    controls = {"move": [0, 0], "cam_yaw_deg": 0, "jump": False, "interact": False, "pulse": False, "dash": False}
+    game = Game(args.seed, scenario, args.night)
+    controls = {"move": [0, 0], "cam_yaw_deg": 0, "jump": False, "interact": False, "pulse": False, "dash": False, "pause": False}
     previous = controls.copy()
     with open(args.out, "w", encoding="utf-8", newline="\n") as out:
         def write(record): out.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
@@ -43,12 +43,12 @@ def run(args):
         for tick in range(args.ticks):
             controls.update(frames.get(tick, {}))
             controls.pop("tick", None)
-            edges = {key: controls[key] and not previous[key] for key in ("jump", "interact", "pulse", "dash")}
+            edges = {key: controls[key] and not previous[key] for key in ("jump", "interact", "pulse", "dash", "pause")}
             game.step(controls, edges)
             for event in game.events: write(event)
-            if game.tick % args.snapshot_every == 0 or game.state != "playing": write(game.snapshot())
+            if game.tick % args.snapshot_every == 0 or game.state in ("won", "lost"): write(game.snapshot())
             previous = {**controls}
-            if game.state != "playing": break
+            if game.state in ("won", "lost"): break
         write({"type": "end", "ticks": game.tick, "state": game.state, "score": game.score})
 
 
@@ -62,8 +62,8 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--snapshot-every", type=int, default=10)
     args = parser.parse_args()
-    if args.night != 1 or args.ticks < 0 or args.snapshot_every <= 0:
-        parser.error("night must be 1 and ticks/snapshot-every must be valid")
+    if args.night not in (1, 2, 3) or args.ticks < 0 or args.snapshot_every <= 0:
+        parser.error("night must be 1, 2, or 3 and ticks/snapshot-every must be valid")
     try:
         run(args)
     except (ValueError, KeyError, TypeError, json.JSONDecodeError, OSError) as exc:
